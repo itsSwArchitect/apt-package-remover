@@ -1,0 +1,9 @@
+Package: apt-package-remover
+Version: 1.0
+Section: admin
+Priority: optional
+Architecture: all
+Depends: whiptail, apt
+Maintainer: Abid Ali abidalicu@gmail.com
+Description: Interactive tool to uninstall installed or user-installed APT packages using a simple menu.
+

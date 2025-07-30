@@ -1,0 +1,99 @@
+#!/bin/bash
+
+# Ensure root privileges
+if [[ "$EUID" -ne 0 ]]; then
+  echo "Please run as root: sudo $0"
+  exit 1
+fi
+
+# Ensure whiptail is installed
+if ! command -v whiptail &> /dev/null; then
+  echo "Installing whiptail..."
+  apt-get update
+  apt-get install -y whiptail
+fi
+
+# Function: Get all installed packages
+get_all_packages() {
+  dpkg --get-selections | grep -v deinstall | awk '{print $1}'
+}
+
+# Function: Get only user-installed packages
+get_user_packages() {
+  comm -23 <(apt-mark showmanual | sort) \
+           <(gzip -dc /var/log/installer/initial-status.gz 2>/dev/null | awk '/^Package: / {print $2}' | sort)
+}
+
+# Function: Display checklist and uninstall selected
+select_and_uninstall() {
+  local pkg_list="$1"
+  local title="$2"
+  local OPTIONS=()
+
+  while IFS= read -r pkg; do
+    OPTIONS+=("$pkg" "" OFF)
+  done <<< "$pkg_list"
+
+  if [[ ${#OPTIONS[@]} -eq 0 ]]; then
+    whiptail --msgbox "No packages found in this category." 10 50
+    return
+  fi
+
+  CHOICES=$(whiptail --title "$title" \
+    --checklist "Select packages to uninstall (SPACE to select, ENTER to confirm):" 25 70 18 \
+    "${OPTIONS[@]}" 3>&1 1>&2 2>&3)
+
+  if [[ -z "$CHOICES" ]]; then
+    echo "No packages selected."
+    return
+  fi
+
+  # Confirm uninstall
+  whiptail --yesno "Are you sure you want to remove these packages?\n$CHOICES" 12 60
+  if [ $? -ne 0 ]; then
+    echo "Cancelled by user."
+    return
+  fi
+
+  # Uninstall selected
+  for pkg in $CHOICES; do
+    clean_pkg=$(echo "$pkg" | tr -d '"')
+    echo "Purging $clean_pkg..."
+    apt-get purge -y "$clean_pkg"
+  done
+
+  echo "Running autoremove and clean..."
+  apt-get autoremove --purge -y
+  apt-get clean
+
+  echo "✅ Uninstallation complete."
+  whiptail --msgbox "Uninstallation complete." 10 50
+}
+
+# Main loop
+while true; do
+  CHOICE=$(whiptail --title "APT Package Remover" --menu "Choose an option:" 15 60 4 \
+    "1" "All installed packages" \
+    "2" "Only user-installed packages" \
+    "3" "Exit" 3>&1 1>&2 2>&3)
+
+  case "$CHOICE" in
+    "1")
+      pkg_data=$(get_all_packages)
+      select_and_uninstall "$pkg_data" "All Installed APT Packages"
+      ;;
+    "2")
+      pkg_data=$(get_user_packages)
+      select_and_uninstall "$pkg_data" "User-Installed APT Packages Only"
+      ;;
+    "3")
+      echo "Exiting."
+      exit 0
+      ;;
+    *)
+      echo "Invalid choice or cancelled."
+      exit 0
+      ;;
+  esac
+done
+
