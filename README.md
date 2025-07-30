@@ -1,5 +1,4 @@
 # apt-package-remover
-
 An interactive Bash tool to uninstall installed APT packages on Debian/Ubuntu systems.
 
 📦 Supports:
@@ -62,3 +61,24 @@ sudo apt remove apt-package-remover
 - **Abid Ali**
 
 Developer | DevOps Engineer | ML Resarcher
+---
+
+
+
+##  Screenshots
+
+### Main Menu
+
+![Main Menu](assets/screenshot-menu.png)
+
+---
+
+###  Select Packages(user-installed packages)
+
+![Select Packages](assets/screenshot-selection01.png)
+
+###  Select Packages(all-installed packages)
+
+![Select Packages](assets/screenshot-selection02.png)
+
+---
