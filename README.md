@@ -33,11 +33,11 @@ An interactive Bash tool to uninstall installed APT packages on Debian/Ubuntu sy
 ### 1. Download the `.deb` file
 
 ```bash
-wget https://github.com/YOUR_USERNAME/apt-package-remover/releases/download/v1.0/apt-package-remover_pkg.deb
+wget https://github.com/itsSwArchitect/apt-package-remover/releases/download/v1.0.0/apt-package-remover_1.0.0_all.deb
 ```
 # Install the package
 ```bash
-sudo dpkg -i apt-package-remover_pkg.deb
+sudo dpkg -i apt-package-remover_1.0.0_all.deb
 ```
 # Usage
 ```bash
