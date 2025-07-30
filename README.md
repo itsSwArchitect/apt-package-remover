@@ -3,7 +3,7 @@ An interactive Bash tool to uninstall installed APT packages on Debian/Ubuntu sy
 
 📦 Supports:
 - All APT-installed packages
-- Only user-installed packages (ignores system dependencies)
+- user-installed packages (ignores system dependencies)
 - Interactive `whiptail` UI
 - Multiple selection with Space + Enter
 - Clean removal using `apt purge`
